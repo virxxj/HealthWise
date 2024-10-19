@@ -1,18 +1,25 @@
-const mongoose = require('mongoose');
+const { MongoClient, ServerApiVersion } = require('mongodb');
+require('dotenv').config(); // This will load environment variables from the .env file
 
-const connectDB = async () => {
-    try {
-        await mongoose.connect(process.env.MONGODB_URI, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-        });
-        console.log('MongoDB connected successfully');
-    } catch (error) {
-        console.error('MongoDB connection failed:', error);
-        process.exit(1);
-    }
-};
+const uri = process.env.MONGODB_URI; // Your MongoDB URI from the .env file
 
-connectDB();
+const client = new MongoClient(uri, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  }
+});
 
-module.exports = mongoose;
+async function connectDB() {
+  try {
+    await client.connect();  // Connect to the MongoDB database
+    console.log("Successfully connected to MongoDB!");
+    return client;
+  } catch (err) {
+    console.error("Failed to connect to MongoDB:", err);
+    process.exit(1); // Exit if there's an error
+  }
+}
+
+module.exports = connectDB;
